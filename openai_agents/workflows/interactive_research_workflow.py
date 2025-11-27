@@ -90,7 +90,6 @@ class InteractiveResearchWorkflow:
         image_path: str | None = None,
     ) -> InteractiveResearchResult:
         """Helper to build InteractiveResearchResult"""
-        
         return InteractiveResearchResult(
             short_summary=summary,
             markdown_report=report,

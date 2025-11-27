@@ -265,6 +265,50 @@ def save_report_to_disk(result: InteractiveResearchResult) -> Path:
     return file_manager.save_report(result.markdown_report, filename=filename)
 
 
+def get_absolute_image_path(image_path: str | None) -> str | None:
+    """Convert relative image path to absolute for display."""
+    if not image_path:
+        return None
+    path = Path(image_path)
+    if path.exists():
+        return str(path.resolve())
+    # Try relative to repo root
+    repo_path = REPO_ROOT / image_path
+    if repo_path.exists():
+        return str(repo_path.resolve())
+    return image_path
+
+
+def embed_image_in_markdown(report: str, image_path: str | None) -> str:
+    """Embed image in markdown report as base64 (works in st.markdown and downloads)."""
+    import base64
+    
+    abs_path = get_absolute_image_path(image_path)
+    if not abs_path or not Path(abs_path).exists():
+        return report
+    
+    try:
+        with open(abs_path, "rb") as img_file:
+            b64 = base64.b64encode(img_file.read()).decode()
+            ext = Path(abs_path).suffix.lower()
+            mime = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".webp": "image/webp"}.get(ext, "image/png")
+            image_uri = f"data:{mime};base64,{b64}"
+    except Exception:
+        return report
+    
+    lines = report.split('\n')
+    image_md = f"\n![Research Visualization]({image_uri})\n"
+    
+    # Find first heading and insert image after it
+    for i, line in enumerate(lines):
+        if line.startswith('# '):
+            lines.insert(i + 1, image_md)
+            return '\n'.join(lines)
+    
+    # No heading found, prepend image
+    return image_md + report
+
+
 # ---------------------------------------------------------------------------
 # UI helpers
 # ---------------------------------------------------------------------------
@@ -436,11 +480,12 @@ def render_result_section() -> None:
     st.subheader("📑 Research deliverables")
     
     # Display generated image if available
-    if result.image_file_path and Path(result.image_file_path).exists():
+    abs_image_path = get_absolute_image_path(result.image_file_path)
+    if abs_image_path and Path(abs_image_path).exists():
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
             st.image(
-                result.image_file_path,
+                abs_image_path,
                 caption="AI-Generated Research Visualization",
             )
     
@@ -455,21 +500,24 @@ def render_result_section() -> None:
             unsafe_allow_html=True,
         )
 
+    # Embed image in markdown for display/download
+    markdown_with_image = embed_image_in_markdown(result.markdown_report, result.image_file_path)
+
     download_cols = st.columns(3)
     download_cols[0].download_button(
         "📝 Download Markdown",
-        data=result.markdown_report,
+        data=markdown_with_image,
         file_name=f"{st.session_state.workflow_id}_report.md",
         mime="text/markdown",
         use_container_width=True,
     )
 
-    if result.image_file_path and Path(result.image_file_path).exists():
-        with open(result.image_file_path, "rb") as img_file:
+    if abs_image_path and Path(abs_image_path).exists():
+        with open(abs_image_path, "rb") as img_file:
             download_cols[1].download_button(
                 "🖼️ Download Image",
                 data=img_file.read(),
-                file_name=Path(result.image_file_path).name,
+                file_name=Path(abs_image_path).name,
                 mime="image/png",
                 use_container_width=True,
             )
@@ -493,7 +541,7 @@ def render_result_section() -> None:
         st.caption("Workflow did not return additional follow-up questions.")
 
     with st.expander("Full Markdown report", expanded=False):
-        st.markdown(result.markdown_report, unsafe_allow_html=True)
+        st.markdown(markdown_with_image, unsafe_allow_html=True)
 
 
 def render_history_panel() -> None:

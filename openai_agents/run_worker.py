@@ -82,7 +82,7 @@ async def main():
         ],
         activities=[
             generate_pdf,
-            generate_image
+            generate_image,
             process_clarification,
         ],
     )

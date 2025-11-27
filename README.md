@@ -31,7 +31,7 @@ temporal server start-dev
 TEMPORAL_API_KEY=''
 TEMPORAL_NAMESPACE=''
 TEMPORAL_ENDPOINT=''
-CONNECT_CLOUD='Y'
+CONNECT_CLOUD='N'
 TEMPORAL_TASK_QUEUE='research-queue'
 ```
 
