@@ -13,7 +13,7 @@ Access original repo [here](https://github.com/steveandroulakis/openai-agents-de
 2. **Temporal Cloud Account**
 3. **OpenAI API Key** - Set as environment variable `OPENAI_API_KEY` in .env file (note, you will need enough quota on in your [OpenAI account](https://platform.openai.com/api-keys) to run this demo)
 4. **PDF Generation Dependencies** - Required for PDF output (optional)
-5. **[Streamlit](https://docs.streamlit.io/get-started)** for UI Interface
+5. **Streamlit** for UI Interface
 
 ### Connect to Temporal Cloud
 
@@ -32,12 +32,12 @@ TEMPORAL_TASK_QUEUE='research-queue'
    ```bash
    uv sync
    ```
-3. Set your OpenAI API key:
+3. Set your [OpenAI API](https://platform.openai.com/api-keys) key:
    ```bash
-   Add OpenAI API key in .env File
+   # Add OpenAI API key in .env File
    OPENAI_API_KEY=''
    ```
-4. Install Streamlit:
+4. Install [Streamlit](https://docs.streamlit.io/get-started/installation):
     ```
     pip install streamlit
     ```
