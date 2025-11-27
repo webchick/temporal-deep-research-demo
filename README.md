@@ -18,7 +18,7 @@ Access original repo [here](https://github.com/steveandroulakis/openai-agents-de
 ### Connect to Temporal Cloud
 
 ```bash
-# Update Temporal Connection info in .env File
+# Update Temporal Connection info in .env File (copy .env-sample to .env)
 TEMPORAL_API_KEY=''
 TEMPORAL_NAMESPACE=''
 TEMPORAL_ENDPOINT=''
