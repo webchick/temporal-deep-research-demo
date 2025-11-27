@@ -60,12 +60,11 @@ async def process_clarification(input: ProcessClarificationInput) -> ProcessClar
 
 @dataclass
 class InteractiveResearchResult:
-    """Result from interactive research workflow including both markdown and PDF"""
+    """Result from interactive research workflow including both markdown"""
 
     short_summary: str
     markdown_report: str
     follow_up_questions: list[str]
-    pdf_file_path: str | None = None
 
 
 @workflow.defn
@@ -87,14 +86,12 @@ class InteractiveResearchWorkflow:
         summary: str,
         report: str,
         questions: list[str] | None = None,
-        pdf_path: str | None = None,
     ) -> InteractiveResearchResult:
         """Helper to build InteractiveResearchResult"""
         return InteractiveResearchResult(
             short_summary=summary,
             markdown_report=report,
             follow_up_questions=questions or [],
-            pdf_file_path=pdf_path,
         )
 
     @workflow.run
@@ -111,14 +108,10 @@ class InteractiveResearchWorkflow:
         if initial_query and not use_clarifications:
             # Simple direct research mode - backward compatibility
             report_data = await self.research_manager._run_direct(initial_query)
-            pdf_file_path = await self.research_manager._generate_pdf_report(
-                report_data
-            )
             return self._build_result(
                 report_data.short_summary,
                 report_data.markdown_report,
                 report_data.follow_up_questions,
-                pdf_file_path,
             )
 
         # Main workflow loop - wait for research to be started and completed
@@ -140,15 +133,10 @@ class InteractiveResearchWorkflow:
 
             # If research has been completed, return results
             if self.research_completed and self.report_data:
-                # Generate PDF if we have report data
-                pdf_file_path = await self.research_manager._generate_pdf_report(
-                    self.report_data
-                )
                 return self._build_result(
                     self.report_data.short_summary,
                     self.report_data.markdown_report,
                     self.report_data.follow_up_questions,
-                    pdf_file_path,
                 )
 
             # If research is initialized but not completed, handle the clarification flow
