@@ -292,6 +292,82 @@ class InteractiveResearchManager:
         report_data = markdown_result.final_output_as(ReportData)
         return report_data
 
+    async def _generate_research_image(
+        self, query: str
+    ) -> tuple[str | None, str | None]:
+        """
+        Generate an image for the research topic using ImageGenAgent.
+
+        The agent will:
+        1. Create a compelling 2-sentence description
+        2. Call the generate_image tool to create and save the image
+        3. Return the file path and description
+
+        Args:
+            query: The enriched research query
+
+        Returns:
+            Tuple of (image_file_path, description) or (None, None) if failed
+        """
+        with custom_span("Generate research image"):
+            try:
+                workflow.logger.info("Generating image with ImageGenAgent...")
+
+                result = await Runner.run(
+                    self.imagegen_agent,
+                    f"Create and generate an image for this research topic: {query}",
+                    run_config=self.run_config,
+                )
+
+                image_output = result.final_output_as(ImageGenData)
+
+                if not image_output.success or not image_output.image_file_path:
+                    # Check if it's a non-retryable error
+                    non_retryable_indicators = [
+                        "organization must be verified",
+                        "Your organization must be verified",
+                        "403",
+                        "invalid_request_error",
+                        "insufficient_quota",
+                        "invalid_api_key",
+                        "PydanticSerializationError",
+                        "invalid utf-8 sequence",
+                        "serialization",
+                    ]
+
+                    error_msg = image_output.error_message or ""
+                    is_non_retryable = any(
+                        indicator.lower() in error_msg.lower()
+                        for indicator in non_retryable_indicators
+                    )
+
+                    if is_non_retryable:
+                        workflow.logger.warning(
+                            f"Non-retryable image generation error: {error_msg}. "
+                            "Continuing without image."
+                        )
+                    else:
+                        workflow.logger.warning(f"Image generation failed: {error_msg}")
+
+                    return (None, None)
+
+                workflow.logger.info(
+                    f"Image generated successfully: {image_output.image_file_path}"
+                )
+
+                return (
+                    image_output.image_file_path,
+                    image_output.image_description,
+                )
+
+            except Exception as e:
+                # Catch any exceptions that bubble up (e.g., ApplicationError with non_retryable=True)
+                error_str = str(e)
+                workflow.logger.warning(
+                    f"Image generation activity failed: {error_str}. Continuing without image."
+                )
+                return (None, None)
+
     async def _generate_pdf_report(self, report_data: ReportData) -> str | None:
         """Generate PDF from markdown report, return file path"""
         try:
