@@ -124,7 +124,8 @@ This example is designed to be similar to the OpenAI Cookbook: [Introduction to 
 - **Writer Agent**: Compiles final research reports
 - **PDF Generator Agent**: Converts markdown reports to professionally formatted PDFs
 
-**To run:**
+**To run the demo:**
+In another terminal:
 
 ```bash
 source .venv/bin/activate
