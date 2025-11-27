@@ -118,7 +118,8 @@ This example is designed to be similar to the OpenAI Cookbook: [Introduction to 
 - **PDF Generator Agent**: Converts markdown reports to professionally formatted PDFs
 
 **To run:**
-```streamlit run ui/streamlit_app.py
+```bash
+streamlit run ui/streamlit_app.py
 ```
 This will launch the Interactive Research App on http://localhost:8501
 
