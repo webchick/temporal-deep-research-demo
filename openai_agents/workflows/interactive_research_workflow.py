@@ -47,7 +47,7 @@ async def process_clarification(input: ProcessClarificationInput) -> ProcessClar
     if is_last_question:
         attempt = activity.info().attempt
         if attempt <= 3:
-            await asyncio.sleep(5)
+            await asyncio.sleep(3)
             raise ApplicationError(f"LLM Agent API failure 😭")
     
     question_key = f"question_{input.current_question_index}"
