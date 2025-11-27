@@ -17,7 +17,7 @@ from temporalio.contrib.openai_agents import OpenAIAgentsPlugin, ModelActivityPa
 
 from temporalio.contrib.pydantic import pydantic_data_converter
 from temporalio.worker import Worker
-
+from openai_agents.workflows.image_generation_activity import generate_image
 from openai_agents.workflows.interactive_research_workflow import (
     InteractiveResearchWorkflow,
 )
@@ -60,6 +60,7 @@ async def main():
         ],
         activities=[
             generate_pdf,
+            generate_image
         ],
     )
     await worker.run()

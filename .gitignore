@@ -1,4 +1,3 @@
-
 # Python
 __pycache__/
 *.py[cod]
@@ -128,6 +127,7 @@ uv.lock
 ehthumbs.db
 Thumbs.db
 
-# PDF Output
+# Generated files
 pdf_output/
+temp_images/
 *.pdf
