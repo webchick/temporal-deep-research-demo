@@ -37,6 +37,12 @@ TEMPORAL_TASK_QUEUE='research-queue'
    OPENAI_API_KEY=''
    ```
 
+### Streamlit
+
+```
+pip install streamlit
+```
+
 ### PDF Generation (optional)
 
 
