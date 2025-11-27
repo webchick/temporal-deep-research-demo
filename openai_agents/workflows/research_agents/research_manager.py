@@ -28,10 +28,14 @@ with workflow.unsafe.imports_passed_through():
         TResponseInputItem,
         custom_span,
         gen_trace_id,
-        trace
+        trace,
     )
 
     from openai_agents.workflows.research_agents.clarifying_agent import Clarifications
+    from openai_agents.workflows.research_agents.imagegen_agent import (
+        ImageGenData,
+        new_imagegen_agent,
+    )
     from openai_agents.workflows.research_agents.pdf_generator_agent import (
         new_pdf_generator_agent,
     )
@@ -70,6 +74,11 @@ class InteractiveResearchManager:
         self.writer_agent = new_writer_agent()
         self.triage_agent = new_triage_agent()
         self.pdf_generator_agent = new_pdf_generator_agent()
+        self.imagegen_agent = new_imagegen_agent()
+
+        # Image state (stored during generation for PDF embedding)
+        self.research_image_path: str | None = None
+        self.research_image_description: str | None = None
 
     async def run(self, query: str, use_clarifications: bool = False) -> str:
         """
@@ -88,12 +97,27 @@ class InteractiveResearchManager:
             return report.markdown_report
 
     async def _run_direct(self, query: str) -> ReportData:
-        """Original direct research flow"""
+        """Original direct research flow with parallel image generation"""
         trace_id = gen_trace_id()
         with trace("Research trace", trace_id=trace_id):
+            # Start image generation immediately to run in parallel with entire research pipeline
+            workflow.logger.info(
+                "Starting image generation in parallel with research pipeline"
+            )
+            image_task = asyncio.create_task(self._generate_research_image(query))
+
+            # Perform research pipeline (planning, searching, writing)
             search_plan = await self._plan_searches(query)
             search_results = await self._perform_searches(search_plan)
             report = await self._write_report(query, search_results)
+
+            # Wait for image generation to complete (if not already done)
+            workflow.logger.info("Waiting for image generation to complete")
+            image_path, image_description = await image_task
+
+            # Store image data for PDF generation
+            self.research_image_path = image_path
+            self.research_image_description = image_description
 
         return report
 
@@ -117,12 +141,25 @@ class InteractiveResearchManager:
                 )
             else:
                 # No clarifications needed, continue with research
-                # The triage agent routed to instruction agent, which should then
-                # continue through planner -> search -> writer automatically
-                # Let's run the direct research flow since no clarifications are needed
+                # Start image generation immediately to run in parallel with entire research pipeline
+                workflow.logger.info(
+                    "Starting image generation in parallel with research pipeline"
+                )
+                image_task = asyncio.create_task(self._generate_research_image(query))
+
+                # Perform research pipeline (planning, searching, writing)
                 search_plan = await self._plan_searches(query)
                 search_results = await self._perform_searches(search_plan)
                 report = await self._write_report(query, search_results)
+
+                # Wait for image generation to complete (if not already done)
+                workflow.logger.info("Waiting for image generation to complete")
+                image_path, image_description = await image_task
+
+                # Store image data for PDF generation
+                self.research_image_path = image_path
+                self.research_image_description = image_description
+
                 return ClarificationResult(
                     needs_clarifications=False,
                     research_output=report.markdown_report,
@@ -138,11 +175,26 @@ class InteractiveResearchManager:
             # Enrich the query with clarification responses
             enriched_query = self._enrich_query(original_query, questions, responses)
 
-            # Now run the full research pipeline with the enriched query
-            # This should go through planner → search → writer
+            # Start image generation immediately to run in parallel with entire research pipeline
+            workflow.logger.info(
+                "Starting image generation in parallel with research pipeline"
+            )
+            image_task = asyncio.create_task(
+                self._generate_research_image(enriched_query)
+            )
+
+            # Perform research pipeline (planning, searching, writing)
             search_plan = await self._plan_searches(enriched_query)
             search_results = await self._perform_searches(search_plan)
             report = await self._write_report(enriched_query, search_results)
+
+            # Wait for image generation to complete (if not already done)
+            workflow.logger.info("Waiting for image generation to complete")
+            image_path, image_description = await image_task
+
+            # Store image data for PDF generation
+            self.research_image_path = image_path
+            self.research_image_description = image_description
 
             return report
 
