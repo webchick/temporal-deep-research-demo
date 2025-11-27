@@ -20,6 +20,7 @@ from temporalio.worker import Worker
 
 from openai_agents.workflows.interactive_research_workflow import (
     InteractiveResearchWorkflow,
+    process_clarification,
 )
 from openai_agents.workflows.pdf_generation_activity import generate_pdf
 
@@ -81,6 +82,7 @@ async def main():
         ],
         activities=[
             generate_pdf,
+            process_clarification,
         ],
     )
     await worker.run()
