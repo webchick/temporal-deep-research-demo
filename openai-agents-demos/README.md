@@ -15,13 +15,13 @@ Access original repo [here](https://github.com/steveandroulakis/openai-agents-de
 4. **PDF Generation Dependencies** - Required for PDF output (optional)
 5. **Streamlit** for UI Interface
 
-### Connect to Temporal Cloud
+### Connect to [Temporal Cloud](https://docs.temporal.io/cloud/get-started)
 
 ```bash
 # Update Temporal Connection info in .env File
 TEMPORAL_API_KEY=''
 TEMPORAL_NAMESPACE=''
-TEMPORAL_ENDPOINT=''
+TEMPORAL_ADDRESS=''
 TEMPORAL_TASK_QUEUE='research-queue'
 ```
 
