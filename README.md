@@ -10,10 +10,19 @@ Access original repo [here](https://github.com/steveandroulakis/openai-agents-de
 ## Prerequisites
 
 1. **Python 3.10+** - Required for the demos
-2. **Temporal Cloud Account**
+2. Temporal Server - Must be running locally on localhost:7233 OR Connect to [Temporal Cloud](https://temporal.io)
 3. **OpenAI API Key** - Set as environment variable `OPENAI_API_KEY` in .env file (note, you will need enough quota on in your [OpenAI account](https://platform.openai.com/api-keys) to run this demo)
 4. **PDF Generation Dependencies** - Required for PDF output (optional)
 5. **Streamlit** for UI Interface
+
+### Run Temporal Server Locally
+```bash
+# Install Temporal CLI
+curl -sSf https://temporal.download/cli.sh | sh
+
+# Start Temporal server
+temporal server start-dev
+```
 
 ### Connect to Temporal Cloud
 
@@ -22,6 +31,7 @@ Access original repo [here](https://github.com/steveandroulakis/openai-agents-de
 TEMPORAL_API_KEY=''
 TEMPORAL_NAMESPACE=''
 TEMPORAL_ENDPOINT=''
+CONNECT_CLOUD='Y'
 TEMPORAL_TASK_QUEUE='research-queue'
 ```
 
