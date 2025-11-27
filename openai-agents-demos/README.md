@@ -1,4 +1,4 @@
-# OpenAI Agents Python SDK Demos
+# Temporal Interactive Deep Research Demo using OpenAI Agents SDK
 
 This repository builds on the Temporal Interactive Deep Research Demo by @steveandroulakis, adding a Streamlit-based user interface.
 
