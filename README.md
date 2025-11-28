@@ -24,7 +24,7 @@ Access original repo [here](https://github.com/steveandroulakis/openai-agents-de
 TEMPORAL_API_KEY=''
 TEMPORAL_NAMESPACE=''
 TEMPORAL_ENDPOINT=''
-CONNECT_CLOUD='N'
+CONNECT_CLOUD='Y'
 TEMPORAL_TASK_QUEUE='research-queue'
 ```
 
