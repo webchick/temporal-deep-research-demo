@@ -86,7 +86,7 @@ This will launch the Interactive Research App on http://localhost:8501
 ![UI Interface](ui/ui_img.png "UI Interface Img")
 
 
-### About the Demo: Multi-Agent Interactive Research Workflow
+## About the Demo: Multi-Agent Interactive Research Workflow
 
 An enhanced version of the research workflow with interactive clarifying questions to refine research parameters before execution and optional PDF generation.
 
