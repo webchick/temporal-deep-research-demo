@@ -17,7 +17,7 @@ Access original repo [here](https://github.com/steveandroulakis/openai-agents-de
 
 ## Run Temporal Server
 
-### Temporal Cloud
+### [Temporal Cloud](https://docs.temporal.io/develop/python/temporal-client#connect-to-temporal-cloud)
 
 ```bash
 # Update Temporal Connection info in .env File (copy .env-sample to .env)
